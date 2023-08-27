@@ -15,6 +15,7 @@
 # compiled output
 packages/api/dist
 packages/api/node_modules
+/node_modules
 
 # Logs
 logs

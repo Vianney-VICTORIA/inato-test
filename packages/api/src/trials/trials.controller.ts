@@ -1,20 +1,25 @@
-import { Get, Query } from '@nestjs/common'
+import { Get, Query, ValidationPipe, UsePipes } from '@nestjs/common'
 import { Controller } from '@nestjs/common'
+import { TrialsQueryRequestDto } from './dto/trials-query.request.dto'
 import { TrialsService } from './trials.service'
-import { ITrialsParams } from './trials.types'
 
 @Controller('trials')
 export class TrialsController {
   constructor(private readonly trialsService: TrialsService) {}
 
+  @UsePipes(new ValidationPipe({ transform: true }))
   @Get()
-  getTrials(@Query() query: ITrialsParams): string {
-    return this.trialsService.getTrials()
-  }
+  async getTrials(@Query() queryParams: TrialsQueryRequestDto) {
+    const query = {
+      sponsor: queryParams.sponsor,
+      countryCode: queryParams.countryCode
+    }
+    const result = await this.trialsService.getTrials(query)
 
-  //create a new get trial enpoind
-  @Get('/new')
-  create(): string {
-    return 'new trial'
+    // TODO: Here in a real app, we would return a New DTO instead of the raw data
+    // return new TrialsQueryResponseDto({data: result})
+    return {
+      data: result
+    }
   }
 }
