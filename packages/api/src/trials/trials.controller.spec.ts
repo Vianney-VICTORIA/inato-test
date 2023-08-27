@@ -1,91 +1,111 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { HttpService } from '@nestjs/axios'
+import { ValidationPipe } from '@nestjs/common'
+import { TrialsController } from './trials.controller'
 import { TrialsService } from './trials.service'
-import { ITrialsQueryParams, CountryCode, ITrial } from './trials.types'
+import { TrialsQueryRequestDto } from './dto/trials-query.request.dto'
+import { CountryCode } from './trials.types'
+import { validate } from 'class-validator'
+import { plainToClass } from 'class-transformer'
 
-describe('TrialsService', () => {
+describe('TrialsController', () => {
+  let trialsController: TrialsController
   let trialsService: TrialsService
-  let httpService: HttpService
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        TrialsService,
-        {
-          provide: HttpService,
-          useValue: {
-            get: jest.fn()
-          }
-        }
-      ]
+      controllers: [TrialsController],
+      providers: [TrialsService]
     }).compile()
 
+    trialsController = module.get<TrialsController>(TrialsController)
     trialsService = module.get<TrialsService>(TrialsService)
-    httpService = module.get<HttpService>(HttpService)
-  })
-
-  describe('getThirdPartyTrials', () => {
-    it('should fetch third-party trials successfully', async () => {
-      const responseData = 'mocked data' // Replace with your own mock data
-      const axiosResponse = { data: responseData }
-      jest.spyOn(httpService, 'get').mockResolvedValue(axiosResponse)
-      const result = await trialsService.getThirdPartyTrials()
-      expect(result).toEqual(responseData)
-    })
-
-    it('should handle errors when fetching third-party trials', async () => {
-      const error = new Error('Failed to fetch trials')
-      jest.spyOn(httpService, 'get').mockRejectedValue(error)
-
-      await expect(trialsService.getThirdPartyTrials()).rejects.toThrowError(error)
-    })
-  })
-
-  describe('filterOngoingTrials', () => {
-    it('should correctly filter ongoing trials', () => {
-      const rawDataTrials = []
-      const result = trialsService.filterOngoingTrials(rawDataTrials)
-      const expectedFilteredTrials = []
-      expect(result).toEqual(expectedFilteredTrials)
-    })
-  })
-
-  describe('filterTrialsBySponsor', () => {
-    it('should correctly filter trials by sponsor', () => {
-      const rawDataTrials = []
-      const sponsorToFilter = 'Sanofi'
-      const result = trialsService.filterTrialsBySponsor(rawDataTrials, sponsorToFilter)
-      const expectedFilteredTrials = [{ sponsor: 'Company A' /* other properties */ }]
-      expect(result).toEqual(expectedFilteredTrials)
-    })
-  })
-
-  describe('filterTrialsByCountryCode', () => {
-    it('should correctly filter trials by country code', () => {
-      const rawDataTrials = []
-      const countryCodeToFilter = 'FR' as CountryCode
-      const result = trialsService.filterTrialsByCountryCode(rawDataTrials, countryCodeToFilter)
-      const expectedFilteredTrials = [{ country: 'US' /* other properties */ }]
-      expect(result).toEqual(expectedFilteredTrials)
-    })
   })
 
   describe('getTrials', () => {
-    it('should return filtered trials based on query parameters', async () => {
-      const queryParams = { sponsor: 'Company A', countryCode: 'FR' } as ITrialsQueryParams
-      const rawDataTrials = []
-      jest.spyOn(trialsService, 'getThirdPartyTrials').mockResolvedValue(rawDataTrials)
-      jest.spyOn(trialsService, 'filterTrials').mockReturnValue(rawDataTrials)
-      const result = await trialsService.getTrials(queryParams)
-      expect(result).toEqual(rawDataTrials)
+    it('should return trials based on query parameters', async () => {
+      const queryParams: TrialsQueryRequestDto = { sponsor: 'Company A', countryCode: 'FR' }
+      const mockTrials = []
+      jest.spyOn(trialsService, 'getTrials').mockResolvedValue(mockTrials)
+
+      const result = await trialsController.getTrials(queryParams)
+
+      expect(result).toEqual({ data: mockTrials })
     })
 
-    it('should return empty array if no trials found', async () => {
-      const queryParams = { sponsor: 'Nonexistent Company', countryCode: 'FR' } as ITrialsQueryParams
-      const emptyTrials = []
-      jest.spyOn(trialsService, 'getThirdPartyTrials').mockResolvedValue(emptyTrials)
-      const result = await trialsService.getTrials(queryParams)
-      expect(result).toEqual([])
+    it('should return empty data when no trials are found', async () => {
+      const queryParams: TrialsQueryRequestDto = { sponsor: 'Nonexistent Company', countryCode: 'FR' }
+      jest.spyOn(trialsService, 'getTrials').mockResolvedValue([])
+
+      const result = await trialsController.getTrials(queryParams)
+
+      expect(result).toEqual({ data: [] })
     })
+
+    it('should handle service errors', async () => {
+      const queryParams: TrialsQueryRequestDto = { sponsor: 'Company A', countryCode: 'FR' }
+      const error = new Error('Service error')
+      jest.spyOn(trialsService, 'getTrials').mockRejectedValue(error)
+
+      await expect(trialsController.getTrials(queryParams)).rejects.toThrowError(error)
+    })
+
+    it('should transform and validate query parameters using ValidationPipe', async () => {
+      const queryParams: any = { sponsor: 'Company A', countryCode: 'FR' }
+      const mockTrials = []
+      jest.spyOn(trialsService, 'getTrials').mockResolvedValue(mockTrials)
+
+      const result = await trialsController.getTrials(queryParams)
+
+      expect(result).toEqual({ data: mockTrials })
+    })
+  })
+})
+
+describe('TrialsQueryRequestDto', () => {
+  it('should be valid with valid input', async () => {
+    const validInput = {
+      sponsor: 'Company A',
+      countryCode: 'FR'
+    }
+
+    const dtoInstance = plainToClass(TrialsQueryRequestDto, validInput)
+    const errors = await validate(dtoInstance)
+
+    expect(errors).toHaveLength(0)
+  })
+
+  it('should allow missing optional fields', async () => {
+    const validInput = {} // No fields provided
+
+    const dtoInstance = plainToClass(TrialsQueryRequestDto, validInput)
+    const errors = await validate(dtoInstance)
+
+    expect(errors).toHaveLength(0)
+  })
+
+  it('should reject invalid sponsor type', async () => {
+    const invalidInput = {
+      sponsor: 123, // Invalid type
+      countryCode: 'AT'
+    }
+
+    const dtoInstance = plainToClass(TrialsQueryRequestDto, invalidInput)
+    const errors = await validate(dtoInstance)
+
+    expect(errors).toHaveLength(1)
+    expect(errors[0].constraints).toHaveProperty('isString')
+  })
+
+  it('should reject invalid countryCode value', async () => {
+    const invalidInput = {
+      sponsor: 'Company A',
+      countryCode: 'INVALID' // Invalid enum value
+    }
+
+    const dtoInstance = plainToClass(TrialsQueryRequestDto, invalidInput)
+    const errors = await validate(dtoInstance)
+
+    expect(errors).toHaveLength(1)
+    expect(errors[0].constraints).toHaveProperty('isEnum')
   })
 })

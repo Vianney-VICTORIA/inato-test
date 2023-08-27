@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer'
 import { IsString, IsOptional, Max, Min, IsEnum } from 'class-validator'
-import { CountryCode } from '../trials/trials.types'
+import { CountryCode } from '../trials.types'
 
 export class TrialsQueryRequestDto {
   @IsOptional()
@@ -11,5 +11,5 @@ export class TrialsQueryRequestDto {
   @IsOptional()
   @IsString()
   @IsEnum(CountryCode)
-  readonly countryCode?: string
+  readonly countryCode?: CountryCode
 }
