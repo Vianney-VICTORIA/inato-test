@@ -2,16 +2,16 @@
 
 ## Todo API
 
-- [] Scafold the project with NestJS
-- [] Add docs folder and document first choice
-- [] Add trials/ endpoint + business Logic
-- [] Add Swagger to create postman collection
-- [] Add tests
+- [ ]  Scafold the project with NestJS
+- [ ] Add docs folder and document first choice
+- [ ] Add trials/ endpoint + business Logic
+- [ ] Add Swagger to create postman collection
+- [ ] Add tests
 
 ## Todo CLI
 
-- [] Scafold project
-- [] Nest package to call API or Commander from scratch ?
+- [ ] Scafold project
+- [ ] Nest package to call API or Commander from scratch ?
 
 
 ## 🕵🏾‍♀️ Asumptions
