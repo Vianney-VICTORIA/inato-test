@@ -7,8 +7,8 @@ export class TrialsService {
   constructor(private readonly httpService: HttpService) {}
 
   /**
-   * Get the Trials from the third party API
-   * Then filter the trials
+   * Call Method to Get the Trials Data from the Trials third party API.
+   * Call Method to filter the result from this API
    * @returns ITrial[]
    * @param queryParams: ITrialsQueryParams
    */
@@ -21,7 +21,7 @@ export class TrialsService {
   }
 
   /**
-   * Get the Trials from the third party API
+   * Method to Get the Trials Data from the Trials third party API.
    * @returns ITrial[]
    * @throws Error
    */
@@ -40,7 +40,8 @@ export class TrialsService {
   }
 
   /**
-   * Master Filter the Trials per date and status then per sponsor and country code
+   * Call Methods to Filter the Trials per date and status
+   * then per sponsor and country code
    * @param rawDataTrials: ITrial[]
    * @param queryParams: ITrialsQueryParams
    * @returns ITrial[]
@@ -64,7 +65,7 @@ export class TrialsService {
   }
 
   /**
-   * Filter the Trials per date and status
+   * Method to Filter the Trials per date and status
    * A trial is _ongoing_ if:
    * - its start date is in the past
    * - its end date is in the future
@@ -83,7 +84,7 @@ export class TrialsService {
   }
 
   /**
-   * Filter the Trials per sponsor QueryParam
+   * Method to Filter the Trials per sponsor QueryParam
    * @param rawDataTrials: ITrial[]
    * @param sponsor: string
    */
@@ -95,7 +96,7 @@ export class TrialsService {
   }
 
   /**
-   * Filter the Trials per countryCode QueryParam
+   * Method to Filter the Trials per countryCode QueryParam
    * @param rawDataTrials: ITrial[]
    * @param countryCode: CountryCode
    */
