@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer'
+import { Type, Transform } from 'class-transformer'
 import { IsString, IsOptional, IsEnum } from 'class-validator'
 import { CountryCode } from '../trials.types'
 
@@ -10,6 +10,7 @@ export class TrialsQueryRequestDto {
 
   @IsOptional()
   @IsString()
+  @Transform(({ value }) => value.toUpperCase())
   @IsEnum(CountryCode)
   readonly countryCode?: CountryCode
 }
