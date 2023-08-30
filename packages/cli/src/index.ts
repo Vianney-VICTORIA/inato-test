@@ -2,6 +2,7 @@
 
 import { program } from 'commander'
 import { textSync } from 'figlet'
+import * as process from 'process'
 
 interface ITrial {
   name: string
@@ -13,6 +14,8 @@ interface ITrial {
   study_type: string
   primary_purpose: string
 }
+
+const API_URL = process.env.API_URL || 'http://localhost:3000/'
 
 const getTrials = async (
   path: string,
@@ -35,7 +38,7 @@ const getTrials = async (
       apiPath = `${apiPath}?countryCode=${options.countryCode}`
     }
 
-    const response = await fetch(`http://localhost:3000/${apiPath}`)
+    const response = await fetch(`${API_URL}${apiPath}`)
 
     const dataTrials = await response.json().then((data) => {
       return data.data

@@ -102,7 +102,7 @@ export class TrialsService {
    */
   filterTrialsByCountryCode(rawDataTrials: ITrial[], countryCode: CountryCode): ITrial[] {
     const filterTrialsByCountryCode = rawDataTrials.filter((trial) => {
-      return trial.country === countryCode
+      return trial.country.toUpperCase() === countryCode
     })
     return filterTrialsByCountryCode
   }
