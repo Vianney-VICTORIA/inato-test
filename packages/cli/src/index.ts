@@ -15,15 +15,36 @@ interface ITrial {
   primary_purpose: string
 }
 
+enum CountryCode {
+  France = 'FR',
+  Spain = 'ES',
+  Italy = 'IT',
+  Germany = 'DE',
+  Austria = 'AT'
+}
+
 const API_URL = process.env.API_URL || 'http://localhost:3000/'
 
+/**
+ * Method to map the CountryCode enum to the countryCode from the API and transform the Key as a string
+ * @param countryCodeElement
+ */
+const utlisMapCountryCode = (countryCodeElement: string) => {
+  const indexOfS = Object.values(CountryCode).indexOf(countryCodeElement as unknown as CountryCode)
+  return Object.keys(CountryCode)[indexOfS]
+}
+
+/**
+ * Method to get the trials from the API
+ * @param path the path to call in the API
+ * @param options
+ */
 const getTrials = async (
   path: string,
   options?:
     | {
         sponsor?: string
-        countryCode?: string
-        table?: boolean
+        countryCode?: CountryCode
       }
     | undefined
 ) => {
@@ -44,24 +65,12 @@ const getTrials = async (
       return data.data
     })
 
-    if (options?.table) {
-      const formatedResponse = dataTrials.map(async (trial: ITrial) => {
-        const { name, country, start_date, end_date, sponsor, canceled, study_type, primary_purpose } = trial
-        return {
-          name,
-          country,
-          start_date,
-          end_date,
-          sponsor,
-          canceled,
-          study_type,
-          primary_purpose
-        }
-      })
-      console.table(await Promise.all(formatedResponse))
-    } else {
-      console.log(dataTrials)
-    }
+    const formatedResponse = dataTrials.map(async (trial: ITrial) => {
+      const countryName = utlisMapCountryCode(trial.country)
+      return `${trial.name} , ${countryName}`
+    })
+
+    console.log(await Promise.all(formatedResponse))
   } catch (error) {
     console.error('Error occurred while fetching the data!', error)
   }
@@ -78,8 +87,9 @@ program
   .option('-s, --sponsor <string>', 'Filter by sponsor name')
   .option('-c, --countryCode <string>', 'Filter by country code')
   .option('-t, --table <boolean>', 'Display the result in a table')
+  .option('-d, --detailed <boolean>', 'Display the detailed data of the trial')
   // add action that call async function with 2 parameters: path and options where options can be optional
-  .action(async (path, options?: { sponsor?: string; countryCode?: string; table?: boolean }) => {
+  .action(async (path, options?: { sponsor?: string; countryCode?: CountryCode; table?: boolean }) => {
     await getTrials(path, options)
   })
   .parseAsync(process.argv)
