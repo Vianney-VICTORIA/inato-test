@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
-    "composite": true,
-    "outDir": "dist"
-  },
-  "extends": "../../tsconfig.json",
-  "include": ["src"]
+    "rootDir": "src",
+    "outDir": "dist",
+    "strict": true,
+    "target": "es6",
+    "module": "commonjs",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node"
+  }
 }
