@@ -34,15 +34,17 @@ inato-cli -h
     - `inato-cli trials` : List all the trials. You can use the following options:
       - `-c, --country <countryCode>` : Filter by countryCode e.g: fr
       - `-s, --sponsor <sponsor>` : Filter by sponsr name e.g: Sanofi
-      - `-t, --table` : Display the result in a table (Special option - you will need a BIG screen 😅)
       - `-h, --help` : Display the help
 
 
 - Example:
-  - `inato-cli trials -c fr -s Sanofi` : List all the trials in France sponsored by Sanofi.
+  - `inato-cli trials -s Sanofi` : List all the trials sponsored by Sanofi.
   - `inato-cli trials -c fr` : List all the trials in France.
   - `inato-cli trials` : List all the trials.
 
 ## Possible improvements
 
+- Multiple Options can be added to the command to filter the result.
 - Add Options to export the result in a file (csv, json, ...)
+- Add Options to get the Raw Data
+- Add Options to display it as a table

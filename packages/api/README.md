@@ -4,7 +4,7 @@
 $ yarn install
 ```
 
-## Running the app
+## Running the API
 
 ```bash
 # development
